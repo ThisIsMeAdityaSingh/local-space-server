@@ -154,6 +154,93 @@ const AdminValidationsObject = {
     }
 
     return { error: false, message: '' };
+  },
+  /**
+   * This method takes the payload during, admin creation
+   * and passes it to validate payload function. Only if it sees,
+   * the payload to be a non-empty object. and has paid property as true
+   * @param {Object} payload - admin creation payload object.
+   */
+  createAdmin: function (payload) {
+    if (!payload || typeof payload !== 'object' || !Object.keys(payload)?.length) {
+      return {
+        error: true,
+        message: 'No valid payload provided'
+      };
+    }
+
+    if (!payload.paid) {
+      return {
+        error: true,
+        message: 'Payment is needed in order to proceed further'
+      };
+    }
+
+    return this.validatePayload(payload);
+  },
+  /**
+   * This method updates few details related to admin.
+   * Only possible updatable properties are, email
+   * password, phone.
+   * @param {Object} payload - Object containing details to be updated
+   */
+  updateAdmin: function (payload) {
+    if (!payload || typeof payload !== 'object' || !Object.keys(payload)?.length) {
+      return {
+        error: true,
+        message: 'No valid payload provided'
+      };
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(payload, 'password')) {
+      return {
+        error: true,
+        message: 'Password is required to modify any details'
+      };
+    }
+
+    const extractedPayload = {};
+
+    for (const property of ['email', 'password', 'phone', 'newPassword']) {
+      if (Object.prototype.hasOwnProperty.call(payload, property)) {
+        extractedPayload[property] = payload[property];
+      }
+    }
+
+    if (Object.keys(extractedPayload).length < 3) {
+      return {
+        error: true,
+        message: 'No property given to update'
+      };
+    }
+
+    return this.validatePayload(extractedPayload, Object.keys(extractedPayload));
+  },
+  /**
+   * Login methods, check for payload if it contains, email and password property
+   * @param {Object} payload - containing email and password property
+   */
+  loginAdmin: function (payload) {
+    if (!payload || typeof payload !== 'object' || !Object.keys(payload).length) {
+      return {
+        error: true,
+        message: 'Invalid payload provided for login'
+      };
+    }
+
+    for (const property of ['email', 'password']) {
+      if (!Object.prototype.hasOwnProperty.call(payload, property) || !payload[property]) {
+        return {
+          error: true,
+          message: `Missing property: ${property}`
+        };
+      }
+    }
+
+    return {
+      error: false,
+      message: ''
+    };
   }
 };
 
