@@ -16,4 +16,4 @@ function validationMiddleware (validationFunction, parentObject) {
   };
 };
 
-module.exports = { validationMiddleware };
+module.exports = validationMiddleware;

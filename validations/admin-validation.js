@@ -53,7 +53,7 @@ const AdminValidationsObject = {
       type: 'string',
       min: 6,
       max: 6,
-      regex: /^[1-9]{1}[0-9]{2}\\s{0, 1}[0-9]{3}$/,
+      regex: /^[1-9][0-9]{5}$/,
       required: true
     }
   },
@@ -139,10 +139,15 @@ const AdminValidationsObject = {
       }
 
       if (payload[validationProperty].length < this.adminDataMap[validationProperty].min || payload[validationProperty].length > this.adminDataMap[validationProperty].max) {
-        return {
-          error: true,
-          message: `The ${validationProperty} should be between ${this.adminDataMap[validationProperty].min} and ${this.adminDataMap[validationProperty].max} long`
-        };
+        return this.adminDataMap[validationProperty].min !== this.adminDataMap[validationProperty].max
+          ? {
+              error: true,
+              message: `The ${validationProperty} should be between ${this.adminDataMap[validationProperty].min} and ${this.adminDataMap[validationProperty].max} long.`
+            }
+          : {
+              error: true,
+              message: `The ${validationProperty} should be ${this.adminDataMap[validationProperty].max} long.`
+            };
       }
 
       if (!this.adminDataMap[validationProperty].regex.test(payload[validationProperty])) {

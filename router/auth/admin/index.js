@@ -1,12 +1,10 @@
 const authRouter = require('express').Router();
-const middleware = require('../../../middleware/index');
+const validationMiddleware = require('../../../middleware/index');
 const AdminValidationsObject = require('../../../validations/admin-validation');
 
-// TODO: Admin Sign Up
-// TODO: Admin Sign in
-// TODO: Admin profile Update
-// TODO: Admin account delete
+const { adminSignUpController, adminSignInController } = require('../../../controller/admin/index');
 
-authRouter.post('/register', middleware(AdminValidationsObject.createAdmin, AdminValidationsObject), () => {});
+authRouter.post('/register', validationMiddleware(AdminValidationsObject.createAdmin, AdminValidationsObject), adminSignUpController);
+authRouter.post('/login', validationMiddleware(AdminValidationsObject.loginAdmin, AdminValidationsObject), adminSignInController);
 
-module.exports = { authRouter };
+module.exports = authRouter;
