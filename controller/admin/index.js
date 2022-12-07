@@ -1,7 +1,7 @@
 const { supabaseClient } = require('../../config/index');
 
 /**
- * This controllers fires a request to supabase create user endpoint
+ * This controllers fires a request to supabase create user endpoint.
  * METHOD - POST
  */
 async function adminSignUpController (req, res) {
@@ -58,7 +58,7 @@ async function adminSignUpController (req, res) {
 };
 
 /**
- * This controller handles Admin login
+ * This controller handles Admin login.
  * METHOD - POST
  */
 async function adminSignInController (req, res) {
@@ -90,4 +90,36 @@ async function adminSignInController (req, res) {
   }
 };
 
-module.exports = { adminSignUpController, adminSignInController };
+/**
+ * This controller handles Admin details update.
+ * METHOD - PUT
+ */
+async function adminUpdateController (req, res) {
+  const { id } = req.body.id;
+  const updatePayload = req.body;
+
+  const propertyList = ['email', 'newPassword', 'password', 'phone'];
+
+  const extractedPayload = {};
+
+  propertyList.forEach(property => {
+    if (Object.prototype.hasOwnProperty.call(updatePayload, property)) {
+      extractedPayload[property] = updatePayload[property];
+    }
+  });
+
+  const { data, error } = await supabaseClient.auth.admin.updateUserById(id, extractedPayload);
+
+  if (error) {
+    res.status(400);
+    res.json(error);
+    return;
+  }
+
+  if (data) {
+    res.status(200);
+    res.json(data);
+  }
+};
+
+module.exports = { adminSignUpController, adminSignInController, adminUpdateController };

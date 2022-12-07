@@ -11,10 +11,12 @@ server.use('/auth/admin', authRouter);
 
 const PORT = process.env.PORT || '3001';
 
-if (supabase) {
-  server.listen(PORT, () => {
-    console.log(`Server running on ${PORT}`);
-  });
-} else {
-  console.log('Server startup failed');
+const appServer = server.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
+});
+
+if (!supabase) {
+  appServer.close();
 }
+
+module.exports = { server, appServer };

@@ -197,6 +197,13 @@ const AdminValidationsObject = {
       };
     }
 
+    if (!Object.prototype.hasOwnProperty.call(payload, 'id')) {
+      return {
+        error: true,
+        message: 'Admin ID is mandatory for update call'
+      };
+    }
+
     if (!Object.prototype.hasOwnProperty.call(payload, 'password')) {
       return {
         error: true,
@@ -206,9 +213,13 @@ const AdminValidationsObject = {
 
     const extractedPayload = {};
 
-    for (const property of ['email', 'password', 'phone', 'newPassword']) {
+    for (const property of ['email', 'phone', 'newPassword']) {
       if (Object.prototype.hasOwnProperty.call(payload, property)) {
-        extractedPayload[property] = payload[property];
+        if (property === 'newPassword') {
+          extractedPayload.password = payload[property];
+        } else {
+          extractedPayload[property] = payload[property];
+        }
       }
     }
 
