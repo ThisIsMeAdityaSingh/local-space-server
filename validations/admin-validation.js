@@ -94,11 +94,27 @@ const AdminValidationsObject = {
     }
 
     for (const regexObject of this.validPasswordDefinition) {
-      if (!regexObject.regex.test(password)) {
-        return {
-          error: true,
-          message: regexObject.ErrorMessage
-        };
+      if (Object.prototype.hasOwnProperty.call(regexObject, 'minLength') || Object.prototype.hasOwnProperty.call(regexObject, 'maxLength')) {
+        if (password.length < regexObject.minLength) {
+          return {
+            error: true,
+            message: regexObject.ErrorMessage
+          };
+        }
+
+        if (password.length > regexObject.maxLength) {
+          return {
+            error: true,
+            message: regexObject.ErrorMessage
+          };
+        }
+      } else {
+        if (!regexObject.regex.test(password)) {
+          return {
+            error: true,
+            message: regexObject.ErrorMessage
+          };
+        }
       }
     }
 
@@ -118,6 +134,19 @@ const AdminValidationsObject = {
       };
     }
 
+    if (!Object.prototype.hasOwnProperty.call(payload, 'password')) {
+      return {
+        error: true,
+        message: 'Payload does not have property password'
+      };
+    }
+
+    const res = this.passwordValidation(payload.password);
+
+    if (res.error) {
+      return res;
+    }
+
     for (const validationProperty of properties) {
       // check for if the property is present or not, also take into account of required property
       if (!Object.prototype.hasOwnProperty.call(payload, validationProperty)) {
@@ -130,7 +159,6 @@ const AdminValidationsObject = {
       }
 
       // If the property is present, go check for it's validation.
-
       if (typeof payload[validationProperty] !== this.adminDataMap[validationProperty].type) {
         return {
           error: true,

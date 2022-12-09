@@ -108,17 +108,24 @@ async function adminUpdateController (req, res) {
     }
   });
 
-  const { data, error } = await supabaseClient.auth.admin.updateUserById(id, extractedPayload);
+  try {
+    const { data, error } = await supabaseClient.auth.admin.updateUserById(id, extractedPayload);
 
-  if (error) {
-    res.status(400);
-    res.json(error);
-    return;
-  }
+    if (error) {
+      res.status(400);
+      res.json(error);
+      return;
+    }
 
-  if (data) {
-    res.status(200);
-    res.json(data);
+    if (data) {
+      res.status(200);
+      res.json(data);
+    }
+  } catch (error) {
+    res.status(500);
+    res.json({
+      message: 'Server error encountered.'
+    });
   }
 };
 
