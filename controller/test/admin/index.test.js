@@ -133,6 +133,12 @@ describe('Create Admin endpoints', () => {
       expect(res.body).toHaveProperty('message');
     });
   });
+
+  describe('Positive Sign Up flow', () => {});
+
+  describe('Test login endpoints', () => {});
+
+  // delete admin in after all
 });
 
 afterAll(() => appServer.close());
