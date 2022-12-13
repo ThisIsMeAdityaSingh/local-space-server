@@ -134,11 +134,134 @@ describe('Create Admin endpoints', () => {
     });
   });
 
-  describe('Positive Sign Up flow', () => {});
+  let userId = null;
+  const workingPayload = {
+    firstName: 'Tester',
+    lastName: 'User',
+    email: 'testerUser1@gmail.com',
+    password: 'Techneplus@12345',
+    phone: '4325453535',
+    paid: true,
+    addressLine1: 'Avatar',
+    addressLine2: '20425',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    pincode: '500063'
+  };
 
-  describe('Test login endpoints', () => {});
+  describe('Positive Sign Up flow', () => {
+    test('should pass with all valid values', async () => {
+      const res = await request(server)
+        .post(generateURL('register'))
+        .send(workingPayload);
+
+      userId = res.id;
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body).toHaveProperty('role');
+      expect(res.body).toHaveProperty('email');
+      expect(res.body).toHaveProperty('phone');
+      expect(res.body).toHaveProperty('user_metadata');
+    });
+  });
+
+  describe('Test login endpoints', () => {
+    test('should not allow to login with wrong password', async () => {
+      const res = await request(server)
+        .post(generateURL('login'))
+        .send({
+          email: 'testerUser1@gmail.com',
+          password: 'Techneplus@1234'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('name');
+      expect(res.body).toHaveProperty('message');
+    });
+
+    test('should not allow to login with wrong email', async () => {
+      const res = await request(server)
+        .post(generateURL('login'))
+        .send({
+          email: 'testerUser@gmail.com',
+          password: 'Techneplus@1234'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('name');
+      expect(res.body).toHaveProperty('message');
+    });
+
+    test('should not allow login with empty payload', async () => {
+      const res = await request(server)
+        .post(generateURL('login'))
+        .send();
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('message');
+    });
+
+    test('should not allow to login with no email provided', async () => {
+      const res = await request(server)
+        .post(generateURL('login'))
+        .send({
+          password: 'SomeRandomValue'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('message');
+    });
+
+    test('should not allow to login with no password provided', async () => {
+      const res = await request(server)
+        .post(generateURL('login'))
+        .send({
+          email: 'SomeRandomValue'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('message');
+    });
+
+    test('should allow to login with all valid values', async () => {
+      const res = await request(server)
+        .post(generateURL('login'))
+        .send({
+          email: 'testerUser1@gmail.com',
+          password: 'Techneplus@12345'
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('session');
+      expect(res.body).toHaveProperty('session.access_token');
+      expect(res.body).toHaveProperty('session.token_type');
+      expect(res.body).toHaveProperty('session.refresh_token');
+      expect(res.body).toHaveProperty('session.user.id');
+    });
+  });
 
   // delete admin in after all
+  describe('Delete created test user', () => {
+    test('should not delete test admin without payload', async () => {
+      const res = request(server)
+        .delete(generateURL('delete'))
+        .send();
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('message');
+    });
+
+    test('should not delete test admin with empty id', async () => {
+      const res = request(server)
+        .delete(generateURL('delete'))
+        .send({
+          id: ''
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty('message');
+    });
+  });
 });
 
 afterAll(() => appServer.close());

@@ -45,7 +45,7 @@ async function adminSignUpController (req, res) {
 
     if (data) {
       res.status(201);
-      res.json(data);
+      res.json(data.user);
       return;
     }
   } catch (error) {
@@ -129,4 +129,37 @@ async function adminUpdateController (req, res) {
   }
 };
 
-module.exports = { adminSignUpController, adminSignInController, adminUpdateController };
+async function adminDeleteController (req, res) {
+  if (!req || !req.body) {
+    res.status(400);
+    res.json({
+      error: true,
+      message: 'No request body available'
+    });
+    return;
+  }
+
+  const { id } = req.body;
+
+  if (!id) {
+    res.status(400);
+    res.json({
+      error: true,
+      message: 'No ID available to delete'
+    });
+  };
+
+  const { data, error } = await supabaseClient.auth.admin.deleteUser(id);
+
+  if (error) {
+    res.status(404);
+    res.json(error);
+  }
+
+  if (data) {
+    res.send(204);
+    res.json(data);
+  }
+};
+
+module.exports = { adminSignUpController, adminSignInController, adminUpdateController, adminDeleteController };
