@@ -154,8 +154,6 @@ describe('Create Admin endpoints', () => {
       const res = await request(server)
         .post(generateURL('register'))
         .send(workingPayload);
-
-      userId = res.id;
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('role');
@@ -231,6 +229,7 @@ describe('Create Admin endpoints', () => {
           password: 'Techneplus@12345'
         });
 
+      userId = res.body.user.id;
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('session');
       expect(res.body).toHaveProperty('session.access_token');
@@ -243,7 +242,7 @@ describe('Create Admin endpoints', () => {
   // delete admin in after all
   describe('Delete created test user', () => {
     test('should not delete test admin without payload', async () => {
-      const res = request(server)
+      const res = await request(server)
         .delete(generateURL('delete'))
         .send();
 
@@ -252,7 +251,7 @@ describe('Create Admin endpoints', () => {
     });
 
     test('should not delete test admin with empty id', async () => {
-      const res = request(server)
+      const res = await request(server)
         .delete(generateURL('delete'))
         .send({
           id: ''
@@ -260,6 +259,16 @@ describe('Create Admin endpoints', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toHaveProperty('message');
+    });
+
+    test('should delete admin with valid id provided', async () => {
+      const res = await request(server)
+        .delete(generateURL('delete'))
+        .send({
+          id: userId
+        });
+
+      expect(res.status).toBe(204);
     });
   });
 });

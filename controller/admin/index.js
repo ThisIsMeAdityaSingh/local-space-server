@@ -147,6 +147,7 @@ async function adminDeleteController (req, res) {
       error: true,
       message: 'No ID available to delete'
     });
+    return;
   };
 
   const { data, error } = await supabaseClient.auth.admin.deleteUser(id);
@@ -154,12 +155,11 @@ async function adminDeleteController (req, res) {
   if (error) {
     res.status(404);
     res.json(error);
+    return;
   }
 
-  if (data) {
-    res.send(204);
-    res.json(data);
-  }
+  res.status(204);
+  res.json(data);
 };
 
 module.exports = { adminSignUpController, adminSignInController, adminUpdateController, adminDeleteController };
