@@ -129,6 +129,10 @@ async function adminUpdateController (req, res) {
   }
 };
 
+/**
+ * This controller handles delete Admin details.
+ * METHOD - DELETE
+ */
 async function adminDeleteController (req, res) {
   if (!req || !req.body) {
     res.status(400);

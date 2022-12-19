@@ -3,11 +3,13 @@ const dotenv = require('dotenv');
 const supabase = require('./config');
 
 const authRouter = require('./router/auth/admin/index');
+const commonRouter = require('./router/common/index');
 
 const server = express();
 dotenv.config();
 server.use(express.json());
 server.use('/auth/admin', authRouter);
+server.use('/common', commonRouter);
 
 const PORT = process.env.PORT || '3001';
 
