@@ -1,15 +1,13 @@
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-const rapidAPIKey = process.env.X_RapidAPI_Key || '';
-const rapidAPIHost = process.env.X_RapidAPI_Host || '';
-const rapidAPIUrl = process.env.X_RapidAPI_Geo_URL || '';
+const geoStatsAPIKey = process.env.GEO_API_KEY || '';
 
 async function getCountries (req, res) {
   // get countries from RapidAPI
   // get all the necessary keys from dotenv
 
-  if (!rapidAPIHost || !rapidAPIKey || !rapidAPIUrl) {
+  if (!geoStatsAPIKey) {
     res.status(400);
     res.json({
       error: true,
@@ -20,28 +18,19 @@ async function getCountries (req, res) {
     return;
   }
 
-  const options = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': rapidAPIKey,
-      'X-RapidAPI-Host': rapidAPIHost
-    }
-  };
-
   try {
-    const result = await fetch(rapidAPIUrl, options);
-    const response = await result.json();
-
-    if (response?.data) {
+    const response = await fetch(`http://battuta.medunes.net/api/country/all/?key=${geoStatsAPIKey}`);
+    const result = await response.json();
+    if (result) {
       res.status(200);
-      res.json(response.data);
+      res.json(result);
       return;
     }
 
     res.status(400);
-    res.status({
+    res.json({
       error: true,
-      message: 'Unable to get response at the moment'
+      message: 'Error while fetching countries'
     });
     return;
   } catch (error) {
@@ -54,4 +43,61 @@ async function getCountries (req, res) {
   }
 };
 
-module.exports = { getCountries };
+async function getAllRegionsOfCountry (req, res) {
+  if (!geoStatsAPIKey) {
+    res.status(400);
+    res.json({
+      error: true,
+      stage: 1,
+      message: 'No API key or host or URL found'
+    });
+
+    return;
+  }
+
+  if (!req || !req?.body) {
+    res.status(400);
+    res.json({
+      error: true,
+      message: 'No request body found'
+    });
+    return;
+  }
+
+  const countryCode = req.body?.countryCode?.toLowerCase() || '';
+
+  if (!countryCode) {
+    res.status(400);
+    res.json({
+      error: true,
+      message: 'No countryCode provided'
+    });
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://battuta.medunes.net/api/region/${countryCode}/all/?key=${geoStatsAPIKey}`);
+    const result = await response.json();
+    if (result) {
+      res.status(200);
+      res.json(result);
+      return;
+    }
+
+    res.status(400);
+    res.json({
+      error: true,
+      message: 'Error while fetching countries'
+    });
+    return;
+  } catch (error) {
+    res.status(500);
+    res.json({
+      error: true,
+      stage: 2,
+      message: 'Server error encountered'
+    });
+  }
+};
+
+module.exports = { getCountries, getAllRegionsOfCountry };

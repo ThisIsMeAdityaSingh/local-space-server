@@ -1,6 +1,7 @@
 const commonRouter = require('express').Router();
-const { getCountries } = require('../../controller/common/country-state-city');
+const { getCountries, getAllRegionsOfCountry } = require('../../controller/common/country-state-city');
 
 commonRouter.get('/countries', getCountries);
+commonRouter.post('/countries/region', getAllRegionsOfCountry);
 
 module.exports = commonRouter;
