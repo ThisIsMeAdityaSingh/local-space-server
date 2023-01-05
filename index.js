@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const dotenv = require('dotenv');
 const supabase = require('./config');
 
@@ -7,6 +8,7 @@ const commonRouter = require('./router/common/index');
 
 const server = express();
 dotenv.config();
+server.use(cors());
 server.use(express.json());
 server.use('/auth/admin', authRouter);
 server.use('/common', commonRouter);

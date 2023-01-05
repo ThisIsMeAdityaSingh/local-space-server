@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.1.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "node-fetch": "^3.3.0",
